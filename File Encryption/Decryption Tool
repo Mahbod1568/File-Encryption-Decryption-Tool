@@ -1,0 +1,57 @@
+from cryptography.fernet import Fernet
+
+# Function to generate a key and save it into a file
+def generate_key():
+    key = Fernet.generate_key()
+    with open("secret.key", "wb") as key_file:
+        key_file.write(key)
+
+# Function to load the key from the current directory
+def load_key():
+    return open("secret.key", "rb").read()
+
+# Function to encrypt a file
+def encrypt_file(file_name):
+    key = load_key()
+    fernet = Fernet(key)
+
+    with open(file_name, "rb") as file:
+        file_data = file.read()
+
+    encrypted_data = fernet.encrypt(file_data)
+
+    with open(file_name + ".encrypted", "wb") as file:
+        file.write(encrypted_data)
+
+    print(f"{file_name} has been encrypted successfully!")
+
+# Function to decrypt a file
+def decrypt_file(encrypted_file_name):
+    key = load_key()
+    fernet = Fernet(key)
+
+    with open(encrypted_file_name, "rb") as file:
+        encrypted_data = file.read()
+
+    decrypted_data = fernet.decrypt(encrypted_data)
+
+    with open("decrypted_" + encrypted_file_name.replace(".encrypted", ""), "wb") as file:
+        file.write(decrypted_data)
+
+    print(f"{encrypted_file_name} has been decrypted successfully!")
+
+# Main function to run the encryption/decryption tool
+if __name__ == "__main__":
+    print("Welcome to the File Encryption/Decryption Tool!")
+    
+    choice = input("Do you want to (E)ncrypt or (D)ecrypt a file? ").lower()
+
+    if choice == 'e':
+        generate_key()
+        file_name = input("Enter the file name to encrypt: ")
+        encrypt_file(file_name)
+    elif choice == 'd':
+        encrypted_file_name = input("Enter the file name to decrypt: ")
+        decrypt_file(encrypted_file_name)
+    else:
+        print("Invalid choice. Please select 'E' for encrypt or 'D' for decrypt.")
